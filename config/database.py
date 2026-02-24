@@ -2,19 +2,21 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import json
+import os
+from settings import settings
 
-"""SQLALCHEMY_DATABASE_URL = "sqlite:///./activities.db"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL") or (
+    f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}"
+    f"@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
 )
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-"""
-info = open("./config/configdb.json")
-info = json.load(info)
 
 engine = create_engine(
-    f'postgresql://{info["user"]}:{info["pass"]}@{info["host"]}/{info["db"]}')
+    SQLALCHEMY_DATABASE_URL,
+    pool_size=20,        # Número mínimo de conexiones
+    max_overflow=40,     # Número de conexiones adicionales permitidas
+    pool_timeout=40,     # Tiempo de espera para una conexión libre
+    pool_pre_ping=True   # Para verificar que la conexión está viva
+)
 
 SessionLocal = sessionmaker(bind=engine)
 
