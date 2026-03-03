@@ -3,9 +3,12 @@ from pydantic import BaseModel
 from pydantic import Field
 
 
-class Origin(BaseModel):
-    origin_id: int = Field(...)
+class OriginBase(BaseModel):
     origin: str = Field(...)
 
     class Config:
         orm_mode = True
+
+
+class Origin(OriginBase):
+    origin_id: int = Field(...)

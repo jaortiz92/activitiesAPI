@@ -7,16 +7,16 @@ from pydantic import BaseModel
 from pydantic import Field
 
 # App
-from .category import Category
-from .description import Description
-from .kind import Kind
-from .origin import Origin
-from .activity import ActivityShow, ActivityCompleteCreate, ActivityShowFront
+from .category import CategoryBase
+from .description import DescriptionBase
+from .kind import KindBase
+from .origin import OriginBase
+from .activity import ActivityShowFront, ActivityCompleteCreate, ActivityShowFront
 
 
 class TransactionBase(BaseModel):
     transaction_date: date = Field(...)
-    value: int = Field(..., gt=0, lt=70000000)
+    value: int = Field(..., gt=0, lt=100000000)
     detail: Optional[str] = Field(default=None)
 
     class Config:
@@ -31,14 +31,14 @@ class TransactionCreate(TransactionBase):
     destiny_id: int = Field(..., gt=0)
 
 
-class TransactionShow(TransactionBase):
+class TransactionShow(TransactionCreate):
     transaction_id: int = Field(...)
-    category: Category = Field(...)
-    description: Description = Field(...)
-    kind: Kind = Field(...)
-    origin: Origin = Field(...)
-    destiny: Origin = Field(...)
-    activities: List[ActivityShow] = Field(...)
+    category: CategoryBase = Field(...)
+    description: DescriptionBase = Field(...)
+    kind: KindBase = Field(...)
+    origin: OriginBase = Field(...)
+    destiny: OriginBase = Field(...)
+    activities: List[ActivityShowFront] = Field(...)
     created_date: datetime = Field(...)
     updated_date: Optional[datetime] = Field(...)
 

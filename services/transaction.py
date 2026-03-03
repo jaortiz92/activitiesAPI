@@ -1,5 +1,5 @@
 # Python
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text
 
@@ -8,6 +8,7 @@ import models
 from models import Transaction, Activity
 import services
 import schemas
+from datetime import date
 
 
 def validate_foreign_keys(db: Session, transaction: schemas.TransactionCreate):
@@ -39,10 +40,45 @@ def get_transaction(db: Session, transaction_id: int):
     return None
 
 
-def get_transactions(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Transaction).order_by(Transaction.transaction_date.desc(),
-                                          Transaction.transaction_id.desc()
-                                          ).offset(skip).limit(limit).all()
+def get_transactions(
+    db: Session, transaction_id: int,
+    start_date: date, end_date: date,
+    category_id: int, description_id: int, kind_id: int,
+    origin_id: int, destiny_id,
+    min_value: float, max_value: float, detail: str,
+    skip: int, limit: int
+):
+    query = db.query(Transaction)
+    if transaction_id:
+        return query.filter(Transaction.transaction_id == transaction_id).all()
+
+    if start_date:
+        query = query.filter(Transaction.transaction_date >= start_date)
+    if end_date:
+        query = query.filter(Transaction.transaction_date <= end_date)
+    if min_value:
+        query = query.filter(Transaction.value >= min_value)
+    if max_value:
+        query = query.filter(Transaction.value <= max_value)
+    if origin_id:
+        query = query.filter(Transaction.origin_id == origin_id)
+    if destiny_id:
+        query = query.filter(Transaction.destiny_id == destiny_id)
+    if kind_id:
+        query = query.filter(Transaction.kind_id == kind_id)
+    if category_id:
+        query = query.filter(Transaction.category_id == category_id)
+    if description_id:
+        query = query.filter(Transaction.description_id == description_id)
+    if detail:
+        query = query.filter(Transaction.detail.ilike(f"%{detail}%"))
+
+    return query.order_by(
+        Transaction.transaction_date.desc()
+    ).order_by(
+        Transaction.transaction_date.desc(),
+        Transaction.transaction_id.desc()
+    ).offset(skip).limit(limit).all()
 
 
 def create_transaction(db: Session, transaction: schemas.TransactionCreate):

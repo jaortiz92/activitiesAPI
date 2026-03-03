@@ -6,10 +6,13 @@ from pydantic import Field
 from .group import Group
 
 
-class Kind(BaseModel):
-    kind_id: int = Field(...)
-    group: Group = Field(...)
+class KindBase(BaseModel):
     kind: str = Field(...)
 
     class Config:
         orm_mode = True
+
+
+class Kind(KindBase):
+    kind_id: int = Field(...)
+    group: Group = Field(...)

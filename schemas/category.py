@@ -6,10 +6,13 @@ from pydantic import Field
 from .group import Group
 
 
-class Category(BaseModel):
-    category_id: int = Field(...)
-    group: Group = Field(...)
+class CategoryBase(BaseModel):
     category: str = Field(...)
 
     class Config:
         orm_mode = True
+
+
+class Category(CategoryBase):
+    category_id: int = Field(...)
+    group: Group = Field(...)

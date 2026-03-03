@@ -1,5 +1,5 @@
 # Python
-from datetime import datetime
+from datetime import datetime, date
 from typing import Dict, List, Optional
 
 # FastApi
@@ -10,7 +10,7 @@ from fastapi import Body, Path, Query
 from sqlalchemy.orm.session import Session
 
 # App
-#from schemas import Message, MessageCreate
+# from schemas import Message, MessageCreate
 
 from schemas import (
     TransactionCreate, TransactionShow,
@@ -36,6 +36,20 @@ transaction = APIRouter(
     summary="Show all transactions"
 )
 def show_all_transactions(
+    transaction_id: Optional[int] = None,
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    category_id: Optional[int] = None,
+    description_id: Optional[int] = None,
+    kind_id: Optional[int] = None,
+    origin_id: Optional[int] = None,
+    destiny_id: Optional[int] = None,
+    min_value: Optional[float] = None,
+    max_value: Optional[float] = None,
+    detail: Optional[str] = Query(
+        default=None,
+        min_length=3
+    ),
     skip: Optional[int] = Query(
         default=0,
         ge=0,
@@ -72,7 +86,21 @@ def show_all_transactions(
     - created_date: datetime,
     - updated_date: datetime
     """
-    return services.get_transactions(db, skip=skip, limit=limit)
+    return services.get_transactions(
+        db,
+        transaction_id=transaction_id,
+        start_date=start_date,
+        end_date=end_date,
+        category_id=category_id,
+        description_id=description_id,
+        kind_id=kind_id,
+        origin_id=origin_id,
+        destiny_id=destiny_id,
+        min_value=min_value,
+        max_value=max_value,
+        detail=detail,
+        skip=skip, limit=limit
+    )
 
 
 @transaction.get(
@@ -334,7 +362,7 @@ def count_all_transactions(
     status_code=status.HTTP_200_OK,
     summary="Show all transactions to front"
 )
-def show_all_transactions(
+def show_all_transactions_show(
     skip: Optional[int] = Query(
         default=0,
         ge=0,
