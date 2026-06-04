@@ -6,3 +6,4 @@ from .description import description
 from .kind import kind
 from .origin import origin
 from .query import query
+from .budget import budget

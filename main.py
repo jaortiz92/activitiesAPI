@@ -7,7 +7,7 @@ from config import engine
 from models import Base
 from routes import (
     activity, account, transaction, category,
-    description, kind, origin, query
+    description, kind, origin, query, budget
 )
 
 Base.metadata.create_all(bind=engine)
@@ -25,6 +25,7 @@ app.include_router(description)
 app.include_router(kind)
 app.include_router(origin)
 app.include_router(query)
+app.include_router(budget)
 
 # CORS
 
