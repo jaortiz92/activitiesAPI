@@ -32,22 +32,24 @@ def create_budget_group(db: Session, budget_group: BudgetGroupCreate):
     return db_group
 
 
-def get_executed_amount(db: Session, budget_group_id: int, month: int, year: int):
+def get_executed_amount(db: Session, budget_group_id: int, month: int, year: int, mode: str = "monthly"):
     # Get categories in the group
     categories = db.query(BudgetGroupCategory.category_id).filter(
         BudgetGroupCategory.budget_group_id == budget_group_id
     ).all()
     category_ids = [c[0] for c in categories]
-    print(categories)
-    print(category_ids)
 
     if not category_ids:
         return 0
 
     # Calculate date range
     last_day = calendar.monthrange(year, month)[1]
-    start_date = date(year, month, 1)
     end_date = date(year, month, last_day)
+
+    if mode == "ytd":
+        start_date = date(year, 1, 1)
+    else:
+        start_date = date(year, month, 1)
 
     # Sum values of transactions associated with these categories
     # AND that have prefix 5, 6, or 7 in class_account
@@ -69,7 +71,7 @@ def get_executed_amount(db: Session, budget_group_id: int, month: int, year: int
     return total or 0
 
 
-def get_budget_comparison(db: Session, month: int, year: int):
+def get_budget_comparison(db: Session, month: int, year: int, mode: str = "monthly"):
     groups = db.query(BudgetGroup).all()
     comparison = []
 
@@ -80,9 +82,15 @@ def get_budget_comparison(db: Session, month: int, year: int):
             BudgetValue.year == year
         ).first()
 
-        budget_amount = budget_val.amount if budget_val else 0
+        monthly_budget = budget_val.amount if budget_val else 0
+
+        if mode == "ytd":
+            budget_amount = monthly_budget * month
+        else:
+            budget_amount = monthly_budget
+
         executed_amount = get_executed_amount(
-            db, group.budget_group_id, month, year)
+            db, group.budget_group_id, month, year, mode)
 
         comparison.append({
             "group_name": group.name,

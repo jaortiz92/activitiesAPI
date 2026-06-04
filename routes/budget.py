@@ -33,5 +33,5 @@ def create_budget_value(budget_value: BudgetValueCreate, db: Session = Depends(g
 
 
 @budget.get("/comparison", response_model=List[BudgetComparisonItem])
-def get_comparison(month: int, year: int, db: Session = Depends(get_db)):
-    return service.get_budget_comparison(db, month, year)
+def get_comparison(month: int, year: int, mode: str = "monthly", db: Session = Depends(get_db)):
+    return service.get_budget_comparison(db, month, year, mode)
